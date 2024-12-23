@@ -85,6 +85,7 @@ If your desired language is not available, please [open an issue](https://github
 ### Numbers
 
 - Charging Limit
+- Minimum Charging Limit
 - Heater Duration
 
 ### Device Tracker
