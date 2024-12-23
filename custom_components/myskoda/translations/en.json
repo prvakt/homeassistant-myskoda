@@ -181,6 +181,9 @@
             "charge_limit": {
                 "name": "Charge Limit"
             },
+            "minimum_charge_limit": {
+                "name": "Minimum Charge Limit"
+            },
             "auxiliary_heater_duration": {
                 "name": "Heater Duration"
             }

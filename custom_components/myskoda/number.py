@@ -34,7 +34,7 @@ async def async_setup_entry(
 ) -> None:
     """Set up the sensor platform."""
     add_supported_entities(
-        available_entities=[ChargeLimit, AuxiliaryHeaterDuration],
+        available_entities=[ChargeLimit, AuxiliaryHeaterDuration, MinimumChargeLimit],
         coordinators=hass.data[DOMAIN][config.entry_id][COORDINATORS],
         async_add_entities=async_add_entities,
     )
@@ -93,6 +93,43 @@ class ChargeLimit(MySkodaNumber):
 
     def forbidden_capabilities(self) -> list[CapabilityId]:
         return [CapabilityId.CHARGING_MQB]
+
+
+class MinimumChargeLimit(MySkodaNumber):
+    """Minimum Charge limit.
+
+    Represents the minimum value in percent that the car will be charged to
+    when charging cable is connected and at least one timer is active.
+    """
+
+    entity_description = NumberEntityDescription(
+        key="minimum_charge_limit",
+        native_max_value=50,
+        native_min_value=0,
+        native_unit_of_measurement=PERCENTAGE,
+        native_step=10,
+        translation_key="minimum_charge_limit",
+        entity_category=EntityCategory.CONFIG,
+    )
+
+    _attr_device_class = NumberDeviceClass.BATTERY
+
+    @property
+    def native_value(self) -> float | None:  # noqa: D102
+        if departure := self.vehicle.departure_info:
+            return departure.minimum_battery_state_of_charge_in_percent
+
+    @Throttle(timedelta(seconds=API_COOLDOWN_IN_SECONDS))
+    async def async_set_native_value(self, value: float):  # noqa: D102
+        try:
+            await self.coordinator.myskoda.set_minimum_charge_limit(
+                self.vehicle.info.vin, int(value)
+            )
+        except OperationFailedError as exc:
+            _LOGGER.error("Failed to set minimum charging limit: %s", exc)
+
+    def required_capabilities(self) -> list[CapabilityId]:
+        return [CapabilityId.CHARGING, CapabilityId.DEPARTURE_TIMERS]
 
 
 class AuxiliaryHeaterDuration(MySkodaNumber, RestoreEntity):

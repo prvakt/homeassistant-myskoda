@@ -85,6 +85,9 @@
             "charge_limit": {
                 "default": "mdi:battery-lock"
             },
+            "minimum_charge_limit": {
+                "default": "mdi:battery-lock"
+            },
 			"auxiliary_heater_duration": {
 				"default": "mdi:timer"
 			}
