@@ -20,7 +20,7 @@ jobs:
           sudo apt update
 
       - name: Install dev dependencies
-        run: sudo apt install just
+        run: snap install just
 
       - name: Install Poetry
         run: pipx install poetry
